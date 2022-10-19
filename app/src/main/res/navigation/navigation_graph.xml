@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.myapplication.ui.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_personCardFragment"
+            app:destination="@id/personCardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/personFragment"
+        android:name="com.example.myapplication.ui.person.PersonFragment"
+        android:label="fragment_person_list"
+        tools:layout="@layout/fragment_person" />
+    <fragment
+        android:id="@+id/personCardFragment"
+        android:name="com.example.myapplication.ui.person.PersonCardFragment"
+        android:label="fragment_person_card"
+        tools:layout="@layout/fragment_person_card" >
+        <argument
+            android:name="person"
+            app:argType="com.example.myapplication.model.person.Person" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_homeFragment"
+        app:destination="@id/homeFragment"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/navigation_graph"
+        />
+<!--    <action-->
+<!--        android:id="@+id/action_global_personCardFragment"-->
+<!--        app:destination="@id/personCardFragment"/>-->
+    <action
+        android:id="@+id/action_global_personFragment"
+        app:destination="@id/personFragment"/>
+    <argument
+        android:name="person"
+        android:defaultValue="null" />
+
+</navigation>
