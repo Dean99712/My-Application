@@ -18,6 +18,9 @@ interface PeopleDao {
     @Query("Select * from peopleTable")
     fun getAllPeople(): LiveData<List<Person>>
 
+    @Query("Select * from peopleTable")
+    fun getAllPeopleList(): List<Person>
+
     @Update
     fun updatePerson(person: Person)
 

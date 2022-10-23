@@ -2,9 +2,11 @@ package com.example.myapplication.ui.register
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,25 +28,25 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var sharedPreferences: SharedPreferences
+    private final val SHARED_PREFERENCES = "sharedPref"
+    private final val SHARED_PREFERENCES_NAME = "name"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        onTextPressToSignUpActivity()
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE)
         firebaseAuth = FirebaseAuth.getInstance()
         signInWithGoogleClient()
         onButtonCLick()
     }
 
-    private fun onTextPressToSignUpActivity() {
-        binding.directToSignupTv.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-            finish()
-        }
+    fun onTextPressToSignUpActivity(view: View) {
+        val intent = Intent(this, SignUpActivity::class.java)
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        finish()
     }
 
     private fun signInWithGoogleClient() {
@@ -81,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
             }
         } else {
             Snackbar.make(
-                requireViewById(R.id.personFragment),
+                binding.loginActivity,
                 task.exception.toString(),
                 Snackbar.LENGTH_SHORT
             ).show()
@@ -92,44 +94,31 @@ class LoginActivity : AppCompatActivity() {
         val credentials = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credentials).addOnCompleteListener {
             if (it.isSuccessful) {
+                val editor = sharedPreferences.edit()
+                editor.putString(SHARED_PREFERENCES_NAME, account.givenName)
+                editor.apply()
                 val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("email", account.email)
-                intent.putExtra("name", account.displayName)
                 startActivity(intent)
                 finish()
 
             } else {
-                showSnackBar(binding.loginActivity, it.exception.toString())
+                Snackbar.make(binding.loginActivity, it.exception.toString(), Snackbar.LENGTH_SHORT)
+                    .show()
             }
         }
             .addOnFailureListener {
-                showSnackBar(binding.loginActivity, it.message.toString())
+                Snackbar.make(binding.loginActivity, it.message.toString(), Snackbar.LENGTH_SHORT)
+                    .show()
             }
 
     }
 
-//    private fun displayCurrentTime() {
-//        binding.button.setOnClickListener {
-//
-//            val currentTime = LocalDateTime.now()
-//
-//            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//
-//            currentLogin = LocalDateTime.now()
-//            val userLastLogin = currentLogin.format(formatter)
-//            val currentDateTime = currentLogin.format(formatter)
-//            println(userLastLogin)
-//
-//            GlobalScope.launch(Dispatchers.IO){
-//                delay(3600)
-//                currentLogin = LocalDateTime.now()
-//                println(currentLogin)
-//            }
-//        }
-//    }
-
     override fun onStart() {
         super.onStart()
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         if (firebaseAuth.currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -155,25 +144,37 @@ class LoginActivity : AppCompatActivity() {
         ).addOnCompleteListener {
             if (it.isSuccessful) {
 
+                val editor = sharedPreferences.edit()
+                editor.putString(SHARED_PREFERENCES_NAME, email)
+                editor.apply()
+
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top)
                 finish()
 
             } else {
-                Toast.makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
-                it.exception?.message?.let { it1 ->
-                    showSnackBar(binding.loginActivity, it.exception.toString())
+                it.exception?.message?.let { _ ->
+                    Snackbar.make(
+                        binding.loginActivity,
+                        it.exception!!.message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
             }
 
         }.addOnFailureListener {
-            showSnackBar(binding.loginActivity, "Oops Something went wrong")
+            Snackbar.make(binding.loginActivity, "Oops Something went wrong", Snackbar.LENGTH_SHORT)
+                .show()
         }
-        else showSnackBar(binding.loginActivity, "Email or Password Cannot be empty!")
+        else Snackbar.make(
+            binding.loginActivity,
+            "Email or Password Cannot be empty!",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
-    private fun showSnackBar(view: View ,text: String) {
-        Snackbar.make(applicationContext, view, text,Snackbar.LENGTH_SHORT).show()
+    private fun showSnackBar(view: View, text: String) {
+        Snackbar.make(applicationContext, view, text, Snackbar.LENGTH_SHORT).show()
     }
 }

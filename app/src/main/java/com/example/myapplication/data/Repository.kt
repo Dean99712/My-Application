@@ -5,13 +5,8 @@ import androidx.lifecycle.LiveData
 import com.example.myapplication.model.person.IMAGE_TYPE
 import com.example.myapplication.model.person.Person
 import com.example.myapplication.model.person.PersonDatabase
-import com.example.myapplication.model.user.User
-import com.example.myapplication.util.SharedPreferencesManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
-class Repository private constructor(context: Context) {
+class Repository private constructor(context: Context){
 
     private val peopleDao = PersonDatabase.getDatabase(context).getPersonDao()
     private val firebaseManager = FirebaseManager.getInstance(context)
@@ -31,6 +26,10 @@ class Repository private constructor(context: Context) {
         return peopleDao.getAllPeople()
     }
 
+    fun getAllPeopleList() : List<Person> {
+        return peopleDao.getAllPeopleList()
+    }
+
     fun addPerson(person: Person) {
         peopleDao.insertPerson(person)
     }
@@ -39,9 +38,9 @@ class Repository private constructor(context: Context) {
         peopleDao.deletePerson(person)
     }
 
-//    fun updatePerson(id : Int , personName: String, personDetails: String){
-//        return peopleDao.updatePersonById(id , personName, personDetails)
-//    }
+    fun updatePerson(id : Int , personName: String, personDetails: String){
+        return peopleDao.updatePersonById(id , personName, personDetails)
+    }
 
     fun updatePersonImage(person: Person, imagePath: String, imageType: IMAGE_TYPE) {
         peopleDao.updatePersonImage(person, imagePath, imageType)

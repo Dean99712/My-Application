@@ -9,10 +9,13 @@
         android:id="@+id/homeFragment"
         android:name="com.example.myapplication.ui.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_personCardFragment"
             app:destination="@id/personCardFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_personUpdateFragment"
+            app:destination="@id/personUpdateFragment" />
     </fragment>
     <fragment
         android:id="@+id/personFragment"
@@ -23,7 +26,20 @@
         android:id="@+id/personCardFragment"
         android:name="com.example.myapplication.ui.person.PersonCardFragment"
         android:label="fragment_person_card"
-        tools:layout="@layout/fragment_person_card" >
+        tools:layout="@layout/fragment_person_card">
+
+        <argument
+            android:name="person"
+            app:argType="com.example.myapplication.model.person.Person" />
+        <action
+            android:id="@+id/action_personCardFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/personUpdateFragment"
+        android:name="com.example.myapplication.ui.person.PersonUpdateFragment"
+        android:label="fragment_person_update"
+        tools:layout="@layout/fragment_person_update" >
         <argument
             android:name="person"
             app:argType="com.example.myapplication.model.person.Person" />
@@ -32,16 +48,17 @@
         android:id="@+id/action_global_homeFragment"
         app:destination="@id/homeFragment"
         app:launchSingleTop="true"
-        app:popUpTo="@id/navigation_graph"
-        />
-<!--    <action-->
-<!--        android:id="@+id/action_global_personCardFragment"-->
-<!--        app:destination="@id/personCardFragment"/>-->
+        app:popUpTo="@id/navigation_graph" />
+
     <action
         android:id="@+id/action_global_personFragment"
-        app:destination="@id/personFragment"/>
+        app:destination="@id/personFragment" />
+    <action
+        android:id="@+id/action_global_personUpdateFragment"
+        app:destination="@id/personUpdateFragment" />
     <argument
         android:name="person"
         android:defaultValue="null" />
+
 
 </navigation>

@@ -1,5 +1,6 @@
 package com.example.myapplication.util
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,13 +11,14 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.myapplication.R
 import com.example.myapplication.model.person.Person
 import com.example.myapplication.ui.MainActivity
+import com.example.myapplication.ui.register.LoginActivity
 
 object NotificationsManager {
 
-    val CHANNEL_ID = "Notification"
-    val notificationId = 1
+    const val CHANNEL_ID = "Notification"
+    const val notificationId = 1
 
-     fun createNotificationChannel(context : Context) {
+     private fun createNotificationChannel(context : Context) {
 
         val name = CHANNEL_ID
         val descriptionText = "Notification's description"
@@ -48,5 +50,20 @@ object NotificationsManager {
         with(NotificationManagerCompat.from(context)) {
             notify(notificationId, builder.build())
         }
+    }
+
+    fun getServiceNotification(context: Context): Notification {
+        createNotificationChannel(context)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(context, LoginActivity::class.java),
+            0
+        )
+        return NotificationCompat.Builder(context, CHANNEL_ID)
+            .setContentTitle("My service notification")
+            .setSmallIcon(R.drawable.ic_baseline_home_24)
+            .setContentIntent(pendingIntent)
+            .setContentText("Now the user can see that im working in background").build()
     }
 }

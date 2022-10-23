@@ -1,17 +1,9 @@
 package com.example.myapplication.ui.person
 
-import android.graphics.Color
 import android.os.Bundle
-import android.transition.Visibility.MODE_OUT
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import androidx.transition.Explode
-import androidx.transition.Slide
-import androidx.transition.Visibility
 import com.example.myapplication.R
 import com.example.myapplication.data.Repository
 import com.example.myapplication.databinding.FragmentPersonBinding
@@ -19,33 +11,47 @@ import com.example.myapplication.model.person.Person
 import com.example.myapplication.ui.home.HomeFragmentDirections
 import com.example.myapplication.util.NotificationsManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.MaterialContainerTransform
-import com.google.android.material.transition.MaterialElevationScale
-import com.google.android.material.transition.MaterialSharedAxis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
 
 class PersonFragment : Fragment() {
 
     private lateinit var binding: FragmentPersonBinding
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
+
         binding = FragmentPersonBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
-    private fun submitDetails() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+        binding.navigationIcon.setOnClickListener {
+            findNavController().navigateUp()
+        }
+        addPerson()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_action_bar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun addPerson() {
         binding.submitButton.setOnClickListener {
-            val personName = binding.etPersonUpdateName.text.toString()
-            val personDetails = binding.etPersonUpdateDetails.text.toString()
+            val personName = binding.etAddPersonName.text.toString()
+            val personDetails = binding.etAddPersonDetails.text.toString()
             val person = Person(personName, personDetails)
 
             if (!personName.contains("^[a-zA-Z]*$".toRegex()) && personName.isNotEmpty() ||
@@ -76,30 +82,4 @@ class PersonFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        submitDetails()
-        enterTransition = MaterialContainerTransform().apply {
-            // Manually add the Views to be shared since this is not a standard Fragment to
-            // Fragment shared element transition.
-            startView = requireActivity().findViewById(R.id.fab)
-            endView = binding.personFragment
-            duration = 300L
-            scrimColor = Color.TRANSPARENT
-//            containerColor = requireContext().setTheme(R.attr.colorSurface)
-//            containerColor = requireContext().themeColor(R.attr.colorSurface)
-//            startContainerColor = requireContext().themeColor(R.attr.colorSecondary)
-//            endContainerColor = requireContext().themeColor(R.attr.colorSurface)
-        }
-        returnTransition = Slide().apply {
-            duration = 225L
-            addTarget(R.id.personFragment)
-        }
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-            duration = 500L
-            addTarget(R.id.personFragment)
-        }
-
-    }
 }

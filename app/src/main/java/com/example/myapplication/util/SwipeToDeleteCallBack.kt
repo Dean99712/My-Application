@@ -1,4 +1,4 @@
-package com.example.hackeruapp.util
+package com.example.myapplication.util
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView

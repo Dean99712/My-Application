@@ -7,17 +7,18 @@
     android:layout_height="match_parent"
     android:gravity="center|top"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="30dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
         android:gravity="center"
+        android:letterSpacing="0.08"
         android:paddingBottom="50dp"
         android:text="Choose an Option"
-        android:textColor="#595959"
-        android:textSize="16dp" />
+        android:textColor="@color/md_theme_dark_surfaceVariant"
+        android:textSize="24dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,9 +33,12 @@
             android:layout_marginBottom="80dp"
             android:drawableStart="@drawable/ic_round_perm_media_24"
             android:drawablePadding="20dp"
+            android:drawableTint="@color/md_theme_dark_outline"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center|start"
             android:text="Gallery"
-            android:textColor="#717171"
+
+            android:textSize="16dp"
             app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintEnd_toStartOf="@+id/textView2" />
     </LinearLayout>
@@ -52,9 +56,11 @@
             android:layout_marginBottom="80dp"
             android:drawableStart="@drawable/ic_baseline_pageview_24"
             android:drawablePadding="20dp"
+            android:drawableTint="@color/md_theme_dark_outline"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center|start"
             android:text="Internet"
-            android:textColor="#717171"
+            android:textSize="16dp"
             app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintEnd_toStartOf="@+id/textView2" />
     </LinearLayout>
@@ -68,16 +74,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
+
             android:layout_marginRight="32dp"
             android:layout_marginBottom="80dp"
             android:drawableStart="@drawable/ic_baseline_camera_alt_24"
             android:drawablePadding="20dp"
+            android:drawableTint="@color/md_theme_dark_outline"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center|start"
             android:text="Camera"
-            android:textColor="#717171"
+            android:textSize="16dp"
             app:layout_constraintBottom_toTopOf="@+id/textView2"
-            app:layout_constraintEnd_toStartOf="@+id/textView2"
-            />
+            app:layout_constraintEnd_toStartOf="@+id/textView2" />
 
     </LinearLayout>
 

@@ -11,21 +11,48 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="#7531D6"
+        android:background="@color/md_theme_light_surfaceTintColor"
         android:fontFamily="sans-serif-black"
         android:gravity="center"
-        android:text="List"
+        android:text=""
+        android:textColor="@color/md_theme_dark_onBackground"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:letterSpacing="0.3" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/material_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="650dp"
+        android:layout_marginTop="90dp"
+        android:padding="10dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#00FFFFFF"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:transitionGroup="true"
+            tools:background="@android:color/transparent">
+
+        </androidx.recyclerview.widget.RecyclerView>
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/is_list_empty"
         android:layout_width="300dp"
         android:layout_height="150dp"
         android:elevation="50dp"
+        android:visibility="gone"
         app:cardCornerRadius="25dp"
         app:cardElevation="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -43,32 +70,8 @@
             android:gravity="center"
             android:text="List is empty..."
             android:textSize="16dp" />
+
     </androidx.cardview.widget.CardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/material_card_view"
-        android:layout_width="match_parent"
-        android:layout_height="639dp"
-        android:padding="10dp"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="639dp"
-            android:background="#00FFFFFF"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:background="@android:color/transparent" />
-
-    </com.google.android.material.card.MaterialCardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

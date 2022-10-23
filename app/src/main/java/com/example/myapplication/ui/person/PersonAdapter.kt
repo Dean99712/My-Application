@@ -6,11 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.myapplication.R
 import com.example.myapplication.model.person.Person
+import com.google.android.material.card.MaterialCardView
 
 class PersonAdapter(
     val dataList: ArrayList<Person>,
@@ -21,7 +22,7 @@ class PersonAdapter(
 ) : RecyclerView.Adapter<PersonAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val personCard: ConstraintLayout = itemView.findViewById(R.id.person_card_recycler)
+        val personCard: MaterialCardView = itemView.findViewById(R.id.person_card_view)
         val textView: TextView = itemView.findViewById(R.id.item_name)
         val imageView: ImageView = itemView.findViewById(R.id.item_image)
         val personDetails: TextView = itemView.findViewById(R.id.item_details)
@@ -33,23 +34,22 @@ class PersonAdapter(
         return ViewHolder(view)
     }
 
-    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
+    @SuppressLint("CheckResult")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val person = dataList[position]
 
         holder.textView.text = person.name
 
         when (person.imageType) {
-            null -> Glide.with(context).load(R.drawable.ic_baseline_person_24).centerInside()
-                .into(holder.imageView)
-            else -> Glide.with(context).load(person.imagePath).into(holder.imageView)
+            null -> Glide.with(context).load(R.drawable.ic_baseline_person_24)
+                .apply { RequestOptions().dontTransform() }.into(holder.imageView)
+
+            else -> Glide.with(context).load(person.imagePath)
+                .apply { RequestOptions().dontTransform() }.into(holder.imageView)
         }
 
-        if (person.details != null) {
-            holder.personDetails.text = person.details
-        } else {
-            holder.personDetails.text = "Details"
-        }
+        holder.personDetails.text = person.details
 
         holder.imageView.setOnClickListener {
             onPersonImageClick(person)
