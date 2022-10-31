@@ -10,12 +10,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/personCardFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/person_card_details"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:transitionName="@string/person_card_details_transition_name"
             app:cardCornerRadius="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -29,6 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
                 android:scaleType="centerCrop"
+                android:src="@{person.imagePath}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -36,21 +39,21 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardView"
-                android:layout_width="414dp"
-                android:layout_height="446dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="310dp"
-                app:strokeWidth="0dp"
                 app:cardBackgroundColor="@color/cardview_light_background"
-                app:cardCornerRadius="45dp"
+                app:cardCornerRadius="15dp"
                 app:cardElevation="100dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical">
 
                     <TextView
@@ -75,7 +78,7 @@
                     <TextView
                         android:id="@+id/person_details"
                         android:layout_width="match_parent"
-                        android:layout_height="366dp"
+                        android:layout_height="match_parent"
                         android:alpha="0.8"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center|top"

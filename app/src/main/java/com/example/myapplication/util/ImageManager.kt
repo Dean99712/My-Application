@@ -27,15 +27,12 @@ import kotlin.concurrent.thread
 
 object ImageManager {
 
-    private final val REQUEST_CODE = 1
+    private val REQUEST_CODE = 1
 
     fun takePicture(person: Person, getContent: ActivityResultLauncher<Intent>) {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         getContent.launch(intent)
     }
-
-
-
 
     @OptIn(DelicateCoroutinesApi::class)
     fun onImageResultFromCamera(

@@ -16,12 +16,20 @@
         <action
             android:id="@+id/action_homeFragment_to_personUpdateFragment"
             app:destination="@id/personUpdateFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_personFragment"
+            app:destination="@id/personFragment" />
     </fragment>
     <fragment
         android:id="@+id/personFragment"
         android:name="com.example.myapplication.ui.person.PersonFragment"
         android:label="fragment_person_list"
-        tools:layout="@layout/fragment_person" />
+        tools:layout="@layout/fragment_person" >
+        <action
+            android:id="@+id/action_personFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:launchSingleTop="false" />
+    </fragment>
     <fragment
         android:id="@+id/personCardFragment"
         android:name="com.example.myapplication.ui.person.PersonCardFragment"
@@ -33,7 +41,8 @@
             app:argType="com.example.myapplication.model.person.Person" />
         <action
             android:id="@+id/action_personCardFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/personUpdateFragment"
@@ -47,7 +56,7 @@
     <action
         android:id="@+id/action_global_homeFragment"
         app:destination="@id/homeFragment"
-        app:launchSingleTop="true"
+        app:launchSingleTop="false"
         app:popUpTo="@id/navigation_graph" />
 
     <action

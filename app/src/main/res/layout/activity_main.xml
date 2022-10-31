@@ -14,34 +14,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/navigation_graph" />
+        android:clipChildren="false"
+        app:navGraph="@navigation/navigation_graph"
+        />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottom_nav_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:backgroundTint="@color/md_theme_dark_inversePrimary"
-        android:backgroundTintMode="screen"
-        app:fabCradleMargin="10dp"
-        app:fabCradleVerticalOffset="10dp"
-        app:hideOnScroll="true"
         app:menu="@menu/bottom_menu"
-        app:popupTheme="@style/ThemeOverlay.Material3.BottomAppBar" />
+        android:layout_gravity="bottom"
+        app:fabAnimationMode="scale"
+        app:fabAnchorMode="cradle"
+        app:fabCradleMargin="10dp"
+        app:fabAlignmentMode="center"
+        app:hideOnScroll="true"
+        android:backgroundTint="@color/md_theme_dark_inversePrimary"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
-        android:theme="@style/ThemeOverlay.Material3"
-        android:backgroundTint="@color/cardview_light_background"
         android:layout_width="wrap_content"
-        android:elevation="5dp"
         android:layout_height="wrap_content"
-        android:contentDescription="add new person"
-        android:isScrollContainer="true"
+        android:fadingEdgeLength="100dp"
         app:layout_anchor="@id/bottom_nav_bar"
-        app:layout_anchorGravity="top|center"
-        app:srcCompat="@drawable/ic_baseline_add_24"
-        tools:ignore="ImageContrastCheck" />
+        android:backgroundTint="@color/md_theme_dark_onPrimaryContainer"
+        android:src="@drawable/ic_baseline_add_24"
+        android:theme="@style/ThemeOverlay.Material3.FloatingActionButton.Surface" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

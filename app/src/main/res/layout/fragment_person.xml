@@ -5,6 +5,7 @@
     android:id="@+id/personFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/md_theme_light_background"
     tools:context=".ui.person.PersonFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -41,7 +42,7 @@
         android:layout_marginTop="80dp"
         android:backgroundTint="@color/md_theme_dark_inverseSurface"
         app:cardCornerRadius="25dp"
-        app:cardElevation="15dp"
+        app:cardElevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +105,7 @@
         android:clickable="true"
         android:src="@drawable/ic_baseline_done_24"
         android:tintMode="@color/md_theme_light_onSecondary"
-        app:elevation="15dp"
+        app:elevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,33 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
             name="person"
             type="com.example.myapplication.model.person.Person" />
+        <variable
+            name="listener"
+            type="com.example.myapplication.ui.person.PersonAdapter.PersonAdapterListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="110dp"
+        android:transitionGroup="true">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/person_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            android:onClick="@{(view) -> listener.onCardClicked(view, person)}"
             android:padding="15dp"
+            android:transitionName="@{@string/person_card_transition_name(person)}"
             app:cardBackgroundColor="@color/md_theme_light_onSecondary"
             app:cardCornerRadius="10dp"
-            app:cardElevation="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
             app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,12 +44,15 @@
                     android:id="@+id/item_image"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
+                    android:onClick="@{(view) -> listener.onImageClicked(person)}"
                     android:padding="5dp"
                     android:scaleType="centerCrop"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.5" />
+                    app:layout_constraintVertical_bias="0.5"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/item_name"
@@ -53,7 +60,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="4dp"
                     android:gravity="center|start"
-                    android:text=""
+                    android:text="@{person.name}"
                     android:textSize="16sp"
                     app:layout_constraintBottom_toBottomOf="@+id/item_image"
                     app:layout_constraintStart_toEndOf="@+id/item_image"
@@ -65,12 +72,14 @@
                     android:layout_width="66dp"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
+                    android:contentDescription="@string/edit_person_button"
+                    android:onClick="@{(view) -> listener.onEditClicked(person)}"
                     android:src="@drawable/ic_baseline_edit_24"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/item_image"
                     app:layout_constraintVertical_bias="0.49"
-                    app:tint="@color/md_theme_dark_inversePrimary"
+                    app:tint="@color/md_theme_dark_onPrimary"
                     tools:ignore="TouchTargetSizeCheck" />
 
                 <TextView
@@ -80,7 +89,7 @@
                     android:layout_marginStart="4dp"
                     android:alpha="0.7"
                     android:paddingStart="5dp"
-                    android:text=""
+                    android:text="@{person.details}"
                     android:textSize="10sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/item_image"

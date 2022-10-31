@@ -1,26 +1,28 @@
 package com.example.myapplication.util
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
-import com.example.myapplication.R
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import com.example.myapplication.model.user.User
 
 class SharedPreferencesManager private constructor(context: Context) {
 
-    val sharedPreferences =
-        context.getSharedPreferences(R.string.app_name.toString(), AppCompatActivity.MODE_PRIVATE)
+    val SHARED_PREFERENCES = "sharedPref"
+    val SHARED_PREFERENCES_EMAIL = "sharedUserEmail"
+    val SHARED_PREFERENCES_NAME = "sharedUserName"
+    val SHARED_PREFERENCES_LAST_NAME = "sharedUserLastName"
 
+    val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE)
 
     companion object {
-
-        lateinit var myUser: User
 
         private lateinit var instance: SharedPreferencesManager
 
         fun getInstance(context: Context): SharedPreferencesManager {
             if (!Companion::instance.isInitialized) {
+                instance = SharedPreferencesManager(context)
             }
-            instance = SharedPreferencesManager(context)
             return instance
         }
     }

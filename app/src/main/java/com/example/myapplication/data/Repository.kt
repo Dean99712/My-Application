@@ -5,10 +5,12 @@ import androidx.lifecycle.LiveData
 import com.example.myapplication.model.person.IMAGE_TYPE
 import com.example.myapplication.model.person.Person
 import com.example.myapplication.model.person.PersonDatabase
+import com.example.myapplication.model.user.User
 
 class Repository private constructor(context: Context){
 
     private val peopleDao = PersonDatabase.getDatabase(context).getPersonDao()
+    private val userDao = PersonDatabase.getDatabase(context).getUserDao()
     private val firebaseManager = FirebaseManager.getInstance(context)
 
     companion object{
@@ -44,6 +46,10 @@ class Repository private constructor(context: Context){
 
     fun updatePersonImage(person: Person, imagePath: String, imageType: IMAGE_TYPE) {
         peopleDao.updatePersonImage(person, imagePath, imageType)
+    }
+
+    fun addUser(user: User) {
+        userDao.addUser(user)
     }
 
 }

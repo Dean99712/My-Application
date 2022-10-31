@@ -21,4 +21,5 @@ data class Person(
     @PrimaryKey(autoGenerate = true)
     var id = 0
 
+    constructor() : this("", "", "", null)
 }

@@ -5,6 +5,7 @@
     android:id="@+id/personUpdateFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/design_default_color_background"
     tools:context=".ui.person.PersonUpdateFragment">
 
 
@@ -24,9 +25,13 @@
             android:id="@+id/navigation_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_arrow_back_24"
             android:background="@android:color/transparent"
-            app:tint="@color/cardview_light_background" />
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            app:tint="@color/cardview_light_background"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="20dp" />
 
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -38,9 +43,9 @@
         android:layout_height="447dp"
         android:layout_marginHorizontal="15dp"
         android:layout_marginTop="80dp"
-        android:backgroundTint="@color/md_theme_dark_inverseSurface"
+        android:backgroundTint="@color/md_theme_dark_onSurface"
         app:cardCornerRadius="25dp"
-        app:cardElevation="15dp"
+        app:cardElevation="7dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,8 +71,9 @@
                 android:background="@android:color/transparent"
                 android:hint="Enter your name "
                 android:minHeight="48dp"
-                android:paddingLeft="10dp"
-                android:textColorHint="@color/md_theme_dark_inverseOnSurface" />
+                android:paddingStart="10dp"
+                android:textColorHint="@color/md_theme_dark_inverseOnSurface"
+                tools:ignore="RtlSymmetry" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="wrap_content"
@@ -86,7 +92,8 @@
                 android:inputType="textMultiLine"
                 android:paddingStart="10dp"
                 android:paddingTop="25dp"
-                android:textColorHint="@color/md_theme_dark_inverseOnSurface" />
+                android:textColorHint="@color/md_theme_dark_inverseOnSurface"
+                tools:ignore="RtlSymmetry" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </com.google.android.material.card.MaterialCardView>

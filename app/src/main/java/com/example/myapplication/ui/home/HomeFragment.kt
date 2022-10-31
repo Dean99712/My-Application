@@ -3,9 +3,7 @@ package com.example.myapplication.ui.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.DialogInterface
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -16,31 +14,66 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
+import androidx.lifecycle.MutableLiveData
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.util.SwipeToDeleteCallBack
 import com.example.myapplication.R
+import com.example.myapplication.data.FirebaseManager
 import com.example.myapplication.data.Repository
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.example.myapplication.model.person.Person
+import com.example.myapplication.model.user.User
 import com.example.myapplication.ui.person.*
 import com.example.myapplication.util.ImageManager
+import com.example.myapplication.util.SharedPreferencesManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.Hold
+import com.google.android.material.transition.MaterialElevationScale
+import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), PersonAdapter.PersonAdapterListener {
 
-    private lateinit var sharedPreferences: SharedPreferences
-    private val SHARED_PREFERENCES = "sharedPref"
-    private val SHARED_PREFERENCES_NAME = "name"
-    private var person: Person? = null
+    private lateinit var sharedPreferencesManager: SharedPreferencesManager
+    private lateinit var currentUser: User
+    private var personLiveDataList: MutableLiveData<ArrayList<Person>> =
+        MutableLiveData<ArrayList<Person>>()
+    private var currentPerson: Person? = null
     private lateinit var adapter: PersonAdapter
     private lateinit var binding: FragmentHomeBinding
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        sharedPreferencesManager = SharedPreferencesManager.getInstance(requireContext())
+
+        currentUser = User(
+            sharedPreferencesManager.sharedPreferences.getString(
+                sharedPreferencesManager.SHARED_PREFERENCES_EMAIL,
+                ""
+            ).toString(),
+            sharedPreferencesManager.sharedPreferences.getString(
+                sharedPreferencesManager.SHARED_PREFERENCES_NAME,
+                ""
+            ).toString(),
+            sharedPreferencesManager.sharedPreferences.getString(
+                sharedPreferencesManager.SHARED_PREFERENCES_EMAIL,
+                ""
+            ).toString()
+        )
+
+        enterTransition = MaterialFadeThrough().apply {
+            duration = 300L
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -50,45 +83,36 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE)
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = PersonAdapter(
             arrayListOf(),
-            onEditButtonClick(),
-            onPersonImageClick(),
-            onPersonCardClick(),
+            this,
             requireContext()
         )
+
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+
+
+        println("FRAGMENT : HomeFragment")
+
+        createRecyclerView()
         displayUserName()
         requestCameraPermission(requireContext())
-        createRecyclerView()
-        adapter.notifyDataSetChanged()
     }
-
-    private fun onEditButtonClick(): (Person) -> Unit = { person ->
-        val directions = PersonUpdateFragmentDirections.actionGlobalPersonUpdateFragment(person)
-        findNavController().navigate(directions)
-    }
-
-    private fun onPersonCardClick(): (Person) -> Unit = {
-
-            val directions = HomeFragmentDirections.actionHomeFragmentToPersonCardFragment(it)
-            findNavController().navigate(directions)
-        }
 
     @SuppressLint("SetTextI18n")
     private fun displayUserName() {
-        val name = sharedPreferences.getString(SHARED_PREFERENCES_NAME, null)
+        val name = sharedPreferencesManager.sharedPreferences.getString(
+            sharedPreferencesManager.SHARED_PREFERENCES_NAME,
+            null
+        )
         binding.textView.text = "Hello $name"
     }
+
 
     private fun requestCameraPermission(context: Context) {
         when {
@@ -108,13 +132,13 @@ class HomeFragment : Fragment() {
 
     private val getContentFromCamera =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            ImageManager.onImageResultFromCamera(result, person!!, requireContext())
+            ImageManager.onImageResultFromCamera(result, currentPerson!!, requireContext())
         }
 
     private val getContentFromGallery = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        ImageManager.onImageResultFromGallery(result, person!!, requireContext())
+        ImageManager.onImageResultFromGallery(result, currentPerson!!, requireContext())
     }
 
     private val requestPermission =
@@ -126,26 +150,6 @@ class HomeFragment : Fragment() {
             }
 
         }
-
-    private fun onPersonImageClick(): (person: Person) -> Unit = {
-
-        person = it
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-        dialog.setTitle("Choose an image")
-        dialog.setMessage("Choose image for ${person!!.name}")
-        dialog.setNeutralButton("Camera") { _: DialogInterface, _: Int ->
-            ImageManager.takePicture(person!!, getContentFromCamera)
-        }
-        dialog.setPositiveButton("Gallery") { _: DialogInterface, _: Int ->
-
-            ImageManager.getImageFromGallery(person!!, getContentFromGallery)
-        }
-        dialog.setNegativeButton("Network") { _: DialogInterface, _: Int ->
-            ImageManager.getImageFromApi(person!!, requireActivity())
-        }
-        dialog.show()
-    }
 
     @OptIn(DelicateCoroutinesApi::class)
     val swipeToDeleteCallBack = object : SwipeToDeleteCallBack() {
@@ -177,10 +181,19 @@ class HomeFragment : Fragment() {
     }
 
     private fun createRecyclerView() {
-        val recyclerView = view?.findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView?.adapter = adapter
-        val peopleListLiveData = Repository.getInstance(requireContext()).getAllPeopleAsLiveData()
-        peopleListLiveData.observe(viewLifecycleOwner) { personList ->
+        val recyclerView = binding.recyclerView
+        recyclerView.adapter = adapter
+//        val roomDatabasePersonList = Repository.getInstance(requireContext()).getAllPeopleAsLiveData()
+//        roomDatabasePersonList.observe(viewLifecycleOwner) {
+//            val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallBack)
+//            (view?.parent as? ViewGroup)?.doOnPreDraw {
+//                startPostponedEnterTransition()
+//            }
+//            itemTouchHelper.attachToRecyclerView(recyclerView)
+//            updateUi(it)
+//            adapter.updateRecyclerView(it)
+//        }
+        personLiveDataList.observe(viewLifecycleOwner) { personList ->
             val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallBack)
             (view?.parent as? ViewGroup)?.doOnPreDraw {
                 startPostponedEnterTransition()
@@ -189,6 +202,22 @@ class HomeFragment : Fragment() {
             updateUi(personList)
             adapter.updateRecyclerView(personList)
         }
+        eventChangeListener()
+    }
+
+    private fun eventChangeListener() {
+        FirebaseManager.db.collection("users/${currentUser.email}/personList").get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) {
+                    val personList = ArrayList<Person>()
+                    val document = snapshot.documents
+                    document.forEach {
+                        val person = it.toObject(Person::class.java)
+                        personList.add(person!!)
+                    }
+                    personLiveDataList.value = personList
+                }
+            }
     }
 
     private fun updateUi(list: List<Person>) {
@@ -210,4 +239,47 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    override fun onEditClicked(person: Person) {
+
+        val directions = PersonUpdateFragmentDirections.actionGlobalPersonUpdateFragment(person)
+        findNavController().navigate(directions)
+    }
+
+    @SuppressLint("StringFormatInvalid")
+    override fun onCardClicked(cardView: View, person: Person) {
+
+        returnTransition = MaterialElevationScale(true).apply {
+            duration = 300L
+        }
+        exitTransition = MaterialElevationScale(false).apply {
+            duration = 300L
+        }
+
+        val personCardDetailsTransitionName =
+            requireContext().getString(R.string.person_card_details_transition_name)
+
+        val extras = FragmentNavigatorExtras(cardView to personCardDetailsTransitionName)
+        val directions = HomeFragmentDirections.actionHomeFragmentToPersonCardFragment(person)
+        findNavController().navigate(directions, extras)
+    }
+
+    override fun onImageClicked(person: Person) {
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+        dialog.setTitle("Choose an image")
+        dialog.setMessage("Choose image for ${person.name}")
+        dialog.setNeutralButton("Camera") { _: DialogInterface, _: Int ->
+            ImageManager.takePicture(person, getContentFromCamera)
+        }
+        dialog.setPositiveButton("Gallery") { _: DialogInterface, _: Int ->
+
+            ImageManager.getImageFromGallery(person, getContentFromGallery)
+        }
+        dialog.setNegativeButton("Network") { _: DialogInterface, _: Int ->
+            ImageManager.getImageFromApi(person, requireActivity())
+        }
+        dialog.show()
+    }
 }
+

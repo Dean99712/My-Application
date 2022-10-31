@@ -2,8 +2,8 @@
     <string name="app_name">My Application</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="person_card_details_transition_name">person_card_%1$s</string>
-    <string name="person_card_transition_name">person_card_details</string>
-    <string name="shared_transition_card">shared_transition</string>
+    <string name="person_card_details_transition_name">person_card_details</string>
+    <string name="person_card_transition_name">person_card_%1$s</string>
+    <string name="edit_person_button">edit_person_button</string>
 
 </resources>

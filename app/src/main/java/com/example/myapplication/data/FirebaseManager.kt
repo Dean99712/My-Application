@@ -4,17 +4,18 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.example.myapplication.model.person.Person
 import com.example.myapplication.model.user.User
-import com.example.myapplication.util.SharedPreferencesManager
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class FirebaseManager private constructor(val context: Context) {
 
-    private val db = FirebaseFirestore.getInstance()
-    private val usersCollection = "Users"
-
     companion object {
+
+        @SuppressLint("StaticFieldLeak")
+        val db = Firebase.firestore
+
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: FirebaseManager
 
@@ -25,19 +26,13 @@ class FirebaseManager private constructor(val context: Context) {
         }
     }
 
-    fun addUser(user: User): Task<Void> {
-        return db.collection(usersCollection)
-            .document(user.email)
-            .set(user)
+    fun addPersonToUser(user: User, person: Person): Task<DocumentReference> {
+        return db.collection("users/${user.email}/personList").add(person)
     }
 
-    fun getUser(): Task<DocumentSnapshot> {
-        return db.collection(usersCollection).document("dean2910997@gmail.com").get()
+    fun createUser(user: User): Task<Void> {
+        return db.collection("users").document(user.email).set(user)
     }
 
-    fun addPeopleToUser(person: Person) {
-        val user = SharedPreferencesManager.myUser
-        db.collection(usersCollection).document(SharedPreferencesManager.myUser.email)
-            .set(user)
-    }
 }
+

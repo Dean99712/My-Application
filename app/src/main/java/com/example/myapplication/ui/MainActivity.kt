@@ -2,33 +2,26 @@ package com.example.myapplication.ui
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.app.Person
 import android.content.Intent
 import android.content.SharedPreferences
-import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.fragment.app.commit
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import com.example.myapplication.ui.register.LoginActivity
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityMainBinding
-import com.example.myapplication.ui.home.HomeFragment
-import com.example.myapplication.ui.person.PersonFragment
-import com.example.myapplication.ui.person.PersonFragmentDirections
+import com.example.myapplication.ui.home.HomeFragmentDirections
 import com.example.myapplication.util.ForegroundService
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.material.transition.MaterialElevationScale
+import com.google.android.material.transition.MaterialSharedAxis
+
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(),
@@ -44,6 +37,7 @@ class MainActivity : AppCompatActivity(),
             ?.fragments
             ?.first()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -58,6 +52,10 @@ class MainActivity : AppCompatActivity(),
         ContextCompat.startForegroundService(this, serviceIntent)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.fragmentContainerView).navigateUp()
+    }
+
     private fun setButtonClickListener() {
         binding.fab.apply {
             setShowMotionSpecResource(R.animator.fab_show)
@@ -69,21 +67,17 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+
     private fun navigateToPersonFragment() {
+
         currentNavigationFragment?.apply {
-            sharedElementEnterTransition = MaterialElevationScale(true).apply {
-                duration = 30000L
+
+            enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                duration = 300L
             }
         }
-//        currentNavigationFragment?.apply {
-//            exitTransition = MaterialElevationScale(false).apply {
-//                duration = 300L
-//            }
-//            reenterTransition = MaterialElevationScale(true).apply {
-//                duration = 300L
-//            }
-//        }
-        val directions = PersonFragmentDirections.actionGlobalPersonFragment()
+
+        val directions = HomeFragmentDirections.actionHomeFragmentToPersonFragment()
         findNavController(R.id.fragmentContainerView).navigate(directions)
     }
 
@@ -107,7 +101,6 @@ class MainActivity : AppCompatActivity(),
             })
         }
     }
-
 
     private fun setBottomNavigationAndFab() {
         binding.run {
