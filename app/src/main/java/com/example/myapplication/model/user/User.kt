@@ -13,7 +13,6 @@ data class User(
     @ColumnInfo(name = "firstName") var firstName: String,
     @ColumnInfo(name = "lastName") var lastName: String,
     @ColumnInfo(name = "imageUrl") val imageUrl: String? = null,
-//    @ColumnInfo(name = "peopleList") val personList: Map<String,Person>? = null,
 ) {
     constructor() : this("", "", "", "")
 }

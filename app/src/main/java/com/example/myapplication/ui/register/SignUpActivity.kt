@@ -2,44 +2,138 @@ package com.example.myapplication.ui.register
 
 
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.Toast.makeText
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import com.example.myapplication.data.FirebaseManager
 import com.example.myapplication.data.Repository
 import com.example.myapplication.databinding.ActivitySignupBinding
 import com.example.myapplication.model.user.User
 import com.example.myapplication.ui.MainActivity
-import com.example.myapplication.util.SharedPreferencesManager
+import com.facebook.AccessToken
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlin.concurrent.thread
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class SignUpActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var callbackManager: CallbackManager
     private lateinit var binding: ActivitySignupBinding
-    private lateinit var sharedPreferences: SharedPreferencesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        sharedPreferences = SharedPreferencesManager.getInstance(this)
         firebaseAuth = FirebaseAuth.getInstance()
+        callbackManager = CallbackManager.Factory.create()
         signInWithGoogleClient()
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        val currentUser = firebaseAuth.currentUser
+        if (currentUser != null) {
+            updateUI(currentUser)
+        }
+    }
+
+    fun loginWithFacebook(view: View) {
+        LoginManager.getInstance().logInWithReadPermissions(
+            this,
+            listOf("email", "public_profile")
+        )
+        LoginManager.getInstance()
+            .registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+                override fun onCancel() {
+                    Snackbar.make(
+                        binding.signupActivity,
+                        "Ops... Something went wrong!",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onError(error: FacebookException) {
+                    Log.d(TAG, "facebook:onError", error)
+                    Snackbar.make(
+                        binding.signupActivity,
+                        "Ops... Something went wrong! Please try again later",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onSuccess(result: LoginResult) {
+                    Log.d(TAG, "facebook:onSuccess:$result")
+
+                    handleFacebookAccessToken(result.accessToken)
+                }
+            })
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun handleFacebookAccessToken(token: AccessToken) {
+        Log.d(TAG, "handleFacebookAccessToken:$token")
+
+        val credential = FacebookAuthProvider.getCredential(token.token)
+        firebaseAuth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = firebaseAuth.currentUser
+                    FirebaseManager.getInstance(this).createUser(
+                        User(
+                            firebaseAuth.currentUser!!.email!!,
+                            firebaseAuth.currentUser!!.displayName!!,
+                            "",
+                            firebaseAuth.currentUser!!.photoUrl.toString(),
+                        )
+                    )
+                    updateUI(user)
+                } else {
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    makeText(
+                        baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateUI(null)
+                }
+            }
+    }
+
+    private fun updateUI(user: FirebaseUser?) {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     fun goToLoginActivityOnClick(view: View) {
@@ -99,25 +193,25 @@ class SignUpActivity : AppCompatActivity() {
         val credentials = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credentials).addOnCompleteListener {
             if (it.isSuccessful) {
-                val editor = sharedPreferences.sharedPreferences.edit()
-                editor.putString(sharedPreferences.SHARED_PREFERENCES_NAME, account.givenName)
-                editor.putString(sharedPreferences.SHARED_PREFERENCES_LAST_NAME, account.familyName)
-                editor.putString(sharedPreferences.SHARED_PREFERENCES_EMAIL, account.email)
-                editor.apply()
                 val intent = Intent(this, MainActivity::class.java)
+
                 FirebaseManager.getInstance(this).createUser(
                     User(
                         account.email!!,
-                        account.displayName!!,
+                        account.givenName!!,
                         account.familyName!!,
-                        null
+                        account.photoUrl.toString(),
                     )
                 )
                 startActivity(intent)
                 finish()
 
             } else {
-                Snackbar.make(binding.signupActivity, it.exception.toString(), Snackbar.LENGTH_SHORT)
+                Snackbar.make(
+                    binding.signupActivity,
+                    it.exception.toString(),
+                    Snackbar.LENGTH_SHORT
+                )
                     .show()
             }
         }.addOnFailureListener {
@@ -133,25 +227,30 @@ class SignUpActivity : AppCompatActivity() {
         val lastName = binding.lastNameSignupEt.text.toString()
         val email = binding.emailSignupEt.text.toString()
         val password = binding.passwordSignupEt.text.toString()
-        val user = User(
-            email,
-            firstName,
-            lastName,
-            null
-        )
+
+        val user = User(email, firstName, lastName, "")
 
         if (email.isNotEmpty() && password.isNotEmpty()) firebaseAuth.createUserWithEmailAndPassword(
             email, password
         ).addOnCompleteListener { it ->
             if (it.isSuccessful) {
-                val editor = sharedPreferences.sharedPreferences.edit()
-                editor.putString(sharedPreferences.SHARED_PREFERENCES_NAME, firstName)
-                editor.putString(sharedPreferences.SHARED_PREFERENCES_LAST_NAME, lastName)
-                editor.putString(sharedPreferences.SHARED_PREFERENCES_EMAIL, email)
-                editor.apply()
 
-                thread(start = true) {
-                    Repository.getInstance(this).addUser(user)
+                val firebaseUser = Firebase.auth.currentUser
+
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = "$firstName $lastName"
+                }
+
+                firebaseUser!!.updateProfile(profileUpdates)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d(TAG, "User profile updated.")
+                        }
+                    }
+                Log.d("", firebaseAuth.currentUser!!.displayName.toString())
+
+                GlobalScope.launch(Dispatchers.IO) {
+                    Repository.getInstance(this@SignUpActivity).createUser(user)
                 }
                 FirebaseManager.getInstance(this).createUser(user)
                     .addOnSuccessListener {
@@ -165,13 +264,12 @@ class SignUpActivity : AppCompatActivity() {
                         ).show()
                     }
                 val intent = Intent(this, LoginActivity::class.java)
-                firebaseAuth.signOut()
                 startActivity(intent)
-
+                firebaseAuth.signOut()
                 finish()
-                makeText(this, "Signed up successfully!", Toast.LENGTH_LONG).show()
 
             } else makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
+
         }.addOnFailureListener() {
             Snackbar.make(binding.signupActivity, it.message.toString(), Snackbar.LENGTH_LONG)
                 .show()
@@ -180,5 +278,6 @@ class SignUpActivity : AppCompatActivity() {
     }
 
 }
+
 
 

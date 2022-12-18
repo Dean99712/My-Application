@@ -44,6 +44,7 @@
         android:layout_marginTop="12dp"
         android:drawableLeft="@drawable/facebook_logo"
         android:fadingEdgeLength="12dp"
+        android:onClick="loginWithFacebook"
         android:text="Signin with Facebook"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"

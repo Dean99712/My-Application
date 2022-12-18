@@ -79,7 +79,6 @@ class PersonAdapter(
         dataList.clear()
         dataList.addAll(personList)
         notifyDataSetChanged()
-
     }
 }
 

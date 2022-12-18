@@ -5,6 +5,7 @@
 
     <item
         android:icon="@drawable/ic_baseline_login_24"
+        android:enabled="true"
         android:title="Logout"
         app:showAsAction="ifRoom"
         android:id="@+id/logout_om"
@@ -14,7 +15,17 @@
         android:icon="@drawable/ic_baseline_search_24"
         android:id="@+id/search_om"
         android:title="Search"
-        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/placeholder"
+        android:title=""
+        android:checkable="false"
+        />
+    <item
+        android:icon="@drawable/ic_baseline_search_24"
+        android:id="@+id/item1"
+        android:title="Search"
         />
 
 </menu>

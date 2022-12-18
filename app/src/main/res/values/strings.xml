@@ -5,5 +5,14 @@
     <string name="person_card_details_transition_name">person_card_details</string>
     <string name="person_card_transition_name">person_card_%1$s</string>
     <string name="edit_person_button">edit_person_button</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+
+<!--Facebook Strings-->
+    <string name="facebook_app_id">1787894084921726</string>
+    <string name="fb_login_protocol_scheme">fb1787894084921726</string>
+    <string name="facebook_client_token">9a6c49782e0de80edc6aceeec202d6db</string>
+
+
 
 </resources>

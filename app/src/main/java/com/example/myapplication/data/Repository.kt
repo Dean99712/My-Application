@@ -11,7 +11,6 @@ class Repository private constructor(context: Context){
 
     private val peopleDao = PersonDatabase.getDatabase(context).getPersonDao()
     private val userDao = PersonDatabase.getDatabase(context).getUserDao()
-    private val firebaseManager = FirebaseManager.getInstance(context)
 
     companion object{
         private lateinit var instance: Repository
@@ -48,7 +47,7 @@ class Repository private constructor(context: Context){
         peopleDao.updatePersonImage(person, imagePath, imageType)
     }
 
-    fun addUser(user: User) {
+    fun createUser(user: User) {
         userDao.addUser(user)
     }
 

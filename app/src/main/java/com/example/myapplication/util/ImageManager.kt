@@ -11,9 +11,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.api.ApiInterface
 import com.example.myapplication.api.ApiResponse
+import com.example.myapplication.data.FirebaseManager
 import com.example.myapplication.data.Repository
 import com.example.myapplication.model.person.IMAGE_TYPE
 import com.example.myapplication.model.person.Person
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,13 +31,13 @@ import kotlin.concurrent.thread
 object ImageManager {
 
     private val REQUEST_CODE = 1
+    val email: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
     fun takePicture(person: Person, getContent: ActivityResultLauncher<Intent>) {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         getContent.launch(intent)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun onImageResultFromCamera(
         result: ActivityResult,
         person: Person,
@@ -52,9 +55,8 @@ object ImageManager {
                 null
             )
             val uri = Uri.parse(path)
-            GlobalScope.launch(Dispatchers.IO) {
-                addImageToPerson(person, uri.toString(), IMAGE_TYPE.BMP, context)
-            }
+
+            addImageToPerson(person, uri.toString(), IMAGE_TYPE.BMP, context)
         }
     }
 
@@ -66,13 +68,16 @@ object ImageManager {
     }
 
     fun onImageResultFromGallery(
-        result: ActivityResult, person: Person, context: Context
+        result: ActivityResult,
+        person: Person,
+        context: Context,
     ) {
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
             val uri = result.data?.data
             if (uri != null) {
                 context.contentResolver.takePersistableUriPermission(
-                    uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
                 addImageToPerson(person, uri.toString(), IMAGE_TYPE.URI, context)
             }
@@ -82,9 +87,10 @@ object ImageManager {
     fun addImageToPerson(
         person: Person, imagePath: String, imageType: IMAGE_TYPE, context: Context
     ) {
-        thread(start = true) {
+        GlobalScope.launch(Dispatchers.IO) {
             Repository.getInstance(context).updatePersonImage(person, imagePath, imageType)
         }
+        FirebaseManager.getInstance(context).updatePersonImage(person, imagePath, imageType)
     }
 
     fun getImageFromApi(person: Person, context: Context) {
@@ -95,6 +101,7 @@ object ImageManager {
                 val apiResponse = response.body()
                 val apiImage = apiResponse!!.imagesList.toList()
                 val randomImage = apiImage.random()
+
                 addImageToPerson(person, randomImage.imageUrl, IMAGE_TYPE.URL, context)
             }
 
